@@ -80,7 +80,13 @@ class App {
         
    }
 
+
+
+
+
    //  ================================== Customer management methods ==============================
+
+
    static void manageCustomers() {
       while (true) {
          System.out.println();
@@ -234,7 +240,147 @@ class App {
 
 
 
-   
+
+
+
+
+// ========================= Manage Products==========================
+
+   static void manageProducts() {
+
+      while (true) {
+         System.out.println();
+         System.out.println("===Product MANAGEMENT===");
+         System.out.println("1. Add Product");
+         System.out.println("2. View All Products");
+         System.out.println("3. Search Products");
+         System.out.println("4. Update Products");
+         System.out.println("5. Update Stock");
+         System.out.println("6. Back to Main Menu");
+         System.out.print("Enter your choice: ");
+         
+         int choice = scanner.nextInt();
+         scanner.nextLine(); // Consume newline character
+
+         switch (choice) {
+            case 1:
+               addProduct();
+               break;
+            case 2:
+               viewAllProducts();
+               break;
+            case 3:
+               searchProduct();
+               break;
+            case 4:
+               updateProduct();
+               break;
+            case 5:
+               //updateStock();
+               break;
+            case 6:
+               return;    // Go back to main menu
+            default:
+               System.out.println("Invalid choice! Please try again.");
+               System.out.println();
+         }
+      }
+
+      
+      
+   }
+
+
+   // Method to add a new product
+   static void addProduct() {
+
+      if (productCount >= MAX_PRODUCTS) {
+         System.out.println("Product limit reached. Cannot add more products.");
+         return;
+      }
+
+      System.out.println("Enter Product Code: ");
+      String code = scanner.nextLine();
+
+      System.out.println("Enter Product Description: ");
+      String description = scanner.nextLine();
+
+      System.out.println("Enter Product Stock Quantity: ");
+      int quantity = scanner.nextInt();
+
+      System.out.println("Enter Product Unit Price: ");
+      double price = scanner.nextDouble();
+
+      productCodes[productCount] = code;
+      productDescriptions[productCount] = description;
+      productUnitPrice[productCount] = price;
+      productQtyOnHand[productCount] = quantity;
+      productCount++;
+
+      System.out.println("Product added successfully!");
+   }
+
+
+   // Method to view all products
+   static void viewAllProducts() {
+
+      if (productCount == 0) {
+         System.out.println("No products available.");
+         return;
+      }
+
+      System.out.println("=== All Products ===");
+      System.out.println();
+
+      System.out.printf("%-10s %-30s %-10s %-8s%n","Code","Description","Price","Stock");
+      System.out.println("-".repeat(70));
+
+      for (int i = 0; i < productCount; i++) {
+         System.out.printf("%-10s %-30s LKR %-10.2f %-8d%n",
+               productCodes[i], productDescriptions[i], productUnitPrice[i], productQtyOnHand[i]);
+      }
+      System.out.println();
+   }
+
+   //Method to search products
+
+   static void searchProduct() {
+      System.out.println("Enter the product code to search:");
+      String searchCode = scanner.nextLine();
+
+      for (int i=0; i<productCount; i++){
+         if (productCodes[i].equalsIgnoreCase(searchCode)) {
+            System.out.printf("Product found: %-10s %-30s LKR %-10.2f %-8d%n",
+                  productCodes[i], productDescriptions[i], productUnitPrice[i], productQtyOnHand[i]);
+            return;
+         }
+      }
+      System.out.println("Product with code " + searchCode + " not found.");
+   }
+
+
+   //Method to update product
+
+   static void updateProduct() {
+
+      
+
+   }
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
    public static void main(String[] args) {
 
       initializeSampleData();
@@ -257,7 +403,7 @@ class App {
                manageCustomers();
                break;
             case 2:
-              // manageProducts(); 
+               manageProducts(); 
                break;
             case 3:
                //processOrders();

@@ -29,6 +29,8 @@ Functional Requirements
     Allow selective field updates
     Maintain data integrity
     Confirm successful updates
+
+
     2. Product Management Module (20 Marks)
     2.1 Add Product(5 marks)
     Unique product code validation
@@ -51,6 +53,8 @@ Functional Requirements
     Add or subtract stock quantities
     Prevent negative stock levels
     Display current stock after updates
+    
+
     3. Order Processing Module (25 Marks)
     3.1 Create New Order (15 marks)
     Generate unique order IDs
@@ -69,6 +73,7 @@ Functional Requirements
     Show customer information
     List all ordered items with quantities and prices
     Display order total and date
+
     4. Order Management Module (15 Marks)
     4.1 View All Orders (8 marks)
     Display order summary in tabular format
@@ -78,6 +83,8 @@ Functional Requirements
     Display complete order information
     Show itemized list of products
     Include customer and order metadata
+
+
     5. Reporting Module (15 Marks)
     5.1 Sales Summary Report(4 marks)
     Calculate total sales revenue
@@ -96,6 +103,8 @@ Functional Requirements
     User-defined minimum stock level
     Identify products below threshold
     Display products requiring restocking
+
+
     6. User Interface and Navigation (5 Marks)
     6.1 Menu System (3 marks)
     Clear and intuitive main menu
