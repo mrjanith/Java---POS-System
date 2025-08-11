@@ -630,20 +630,250 @@ static void printReceipt(int orderId) {
 
 
 
+// ================ VIEW ORDERS ==================
+
+static void viewOrders() {
+   if (orderCount == 0) {
+      System.out.println("No orders available.");
+      return;
+   }
+
+   System.out.println("\n=== All Orders ===");
+   System.out.printf ("%-8s %-12s %-12d %-20s %-20s %-10s%n","order Id","Order Date","Customer Id","customer Name","Amount");
+   System.out.println("-".repeat(80));
+
+   for (int i = 0; i < orderCount; i++) {
+      String customersName ="";
+      if (customerIds[i] == orderCustomerId[i]){
+         customersName = customerName[i];
+         break;
+
+      }
+
+      System.out.printf("%-8d %-12d %-12d %-20s %-20s %-10.2f%n",
+            orderIds[i],
+            orderDate[i],
+            orderCustomerId[i],
+            customersName,
+            orderDate[i],
+            orderAmount[i]);
+
+
+
+   }
+
+   System.out.println("\nEnter Order Id to view details (or 0 to return)");
+   int orderId = scanner.nextInt();
+
+   if (orderId == 0) {
+      return;
+   }
+
+   // Find and display order details
+   for (int i = 0; i < orderCount; i++) {
+      if (orderIds[i] == orderId) {
+         System.out.printf("Order Id: %d%n", orderIds[i]);
+         System.out.printf("Order Date: %d%n", orderDate[i]);
+         System.out.printf("Customer Id: %d%n", orderCustomerId[i]);
+         System.out.printf("Amount: LKR %.2f%n", orderAmount[i]);
+         return;
+      }
+   }
+
+   System.out.println("Order not found.");
+}
 
 
 
 
+// ==================== GENERATE REPORTS =======================
+
+static void generateReports() {
+   while (true) {
+      System.out.println("\n=== REPORTS MENU ===");
+      System.out.println("1. Sales Summary");
+      System.out.println("2. Product Sales Report");
+      System.out.println("3. Customer Purchase Report");
+      System.out.println("4. Low Stock Alert");
+      System.out.println("5. Back to Main Menu");
+      System.out.print("Enter your choice: ");
 
 
+      int choice = scanner.nextInt();
+      scanner.nextLine(); // Consume newline character
+
+      switch (choice) {
+         case 1:
+            
+            generateSalesSummaryReport();
+            break;
+         case 2:
+            
+            generateProductSalesReport();
+            break;
+         case 3:
+            
+            generateCustomerPurchaseReport();
+            break;
+         case 4:
+            
+            generateLowStockAlert();
+            break;
+         case 5:
+            return; // Back to Main Menu
+         default:
+            System.out.println("Invalid choice! Please try again.");
+      }
+   }
+
+}
+
+
+// Generate Sales Summary Report
+
+static void generateSalesSummaryReport(){
+   if (orderCount == 0) {
+      System.out.println("No orders to summarize.");
+      return;
+   }
+
+   double totalSales = 0;
+   int totalOrders = orderCount;
+
+   for (int i = 0; i < totalOrders; i++) {
+      totalSales += orderAmount[i];
+      
+   }
+
+   double averageOrderValue = totalSales / totalOrders;
+
+   System.out.println("\n=== SALES SUMMARY REPORT ===");
+   System.out.printf("Total Sales: LKR %.2f%n", totalSales);
+   System.out.printf("Total Orders: %d%n", totalOrders);
+   System.out.printf("Average Order Value: LKR %.2f%n", averageOrderValue);
+}
+
+
+// Generate Product Sales Report
+
+static void generateProductSalesReport() {
+   if (orderDetailCount == 0) {
+      System.out.println("No product sales data available.");
+      return;
+   }
+
+   System.out.println("\n=== PRODUCT SALES REPORT ===");
+   System.out.printf("%-15s %-20s %-10s %-10s%n","Code", "Description", "sold Qty", "Revenue");
+
+   for (int i = 0; i < productCount; i++) {
+      int totalSold = 0;
+      double totalRevenue = 0;
+
+      for (int j = 0; j < orderDetailCount; j++) {
+         if (detailProductCodes[j].equals(productCodes)) {
+            totalSold += detailQty[j];
+            totalRevenue += detailQty[j] * detailUnitPrice[j];
+            
+         }
+      }
+
+      System.out.printf("%-15d %-20s %-10d %-10.2f%n",
+            productCodes[i],
+            productDescriptions[i],
+            totalSold,
+            totalRevenue);
+   }
+
+
+}
+
+
+
+// Generate Customer Purchase Report
+
+static void generateCustomerPurchaseReport() {
+   if (orderCount == 0) {
+      System.out.println("No orders to report.");
+      return;
+   }
+
+
+   System.out.println("\n=== CUSTOMER PURCHASE REPORT ===");
+   System.out.printf("%-15s %-20s %-10s %-10s%n", "Customer ID", "Customer Name", "Total Orders", "Total Spent");
+   System.out.println("-".repeat(50));
+
+   for (int i = 0; i < customerCount; i++) {
+      int orderCounter = 0;
+      double totalSpent = 0;
+
+      for (int j=0; j<orderCount; j++) {
+         if (orderCustomerId[j] == customerIds[i]) {
+            orderCounter++;
+            totalSpent += orderAmount[j];
+         }
+      }
+      if (orderCounter > 0) {
+         System.out.printf("%-15d %-20s %-10d LKR %-10.2f%n",
+               customerIds[i],
+               customerName[i],
+               orderCounter,
+               totalSpent);
+      }
+
+
+   }
+
+
+
+
+}
+
+
+// Generate Low Stock Alert
+
+static void generateLowStockAlert() {
+   System.out.println("Enter minimum stock level for alert : ");
+   int minimumStockLevel = scanner.nextInt();
    
- 
+
+   System.out.println("\n=== LOW STOCK ALERT ===");
+   System.out.printf("%-15s %-20s %-10s%n", "Product Code", "Description", "Stock Level");
+   System.out.println("-".repeat(50));
+
+   boolean lowStockFound = false;
+   for (int i=0; i<productCount;i++) {
+      if (productQtyOnHand[i] <= minimumStockLevel){
+         System.out.printf("%-15d %-20s %-10d%n",
+               productCodes[i],
+               productDescriptions[i],
+               productQtyOnHand[i]);
+
+         lowStockFound = true;
+      }
+   }
+   if (!lowStockFound) {
+      System.out.println("All products are above the minimum stock level.");
+   }
+
+}
+   
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+// ============================ Main Menu =============================
 
 public static void main(String[] args) {
 
@@ -673,10 +903,10 @@ public static void main(String[] args) {
                processOrders();
                break;
             case 4:
-               //viewOrders();
+               viewOrders();
                break;
             case 5:
-               //generateReports(); // Call report generation methods
+               generateReports(); // Call report generation methods
                break;
             case 6:
                System.out.println("Thank you for using POS System!");
