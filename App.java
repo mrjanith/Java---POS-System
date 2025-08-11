@@ -418,14 +418,16 @@ class App {
       for (int i = 0; i < productCount; i++) {
          if (productCodes[i].equals(updateCode)) {
             System.out.println("Current Stock Quantity: " + productQtyOnHand[i]);
-            System.out.println("Enter new Stock Quantity (or press -1 to keep current quantity): ");
-            int newQuantityInput = scanner.nextInt();
+            System.out.println("Quantity to add (or negative to subtract): ");
+            int change = scanner.nextInt();
 
-            if (newQuantityInput != -1) {
-               productQtyOnHand[i] = newQuantityInput;
+            if (productQtyOnHand[i] + change < 0) {
+               System.out.println("Insufficient stock available.");
+               return;
             }
 
-            System.out.println("Stock updated successfully!");
+            productQtyOnHand[i] += change;
+            System.out.println("Stock updated successfully! New Stock Quantity: " + productQtyOnHand[i]);
             return;
          }
       }
@@ -439,6 +441,43 @@ class App {
      
   // =========================== PROCESS ORDERS =======================================
 
+ static void processOrders() {
+
+   while (true) {
+      System.out.println();
+      System.out.println("===ORDER MANAGEMENT===");
+      System.out.println("1. Create Order");
+      System.out.println("2. View All Orders");
+      System.out.println("3. Search Order");
+      System.out.println("4. Update Order");
+      System.out.println("5. Back to Main Menu");
+      System.out.print("Enter your choice: ");
+      
+      int choice = scanner.nextInt();
+      scanner.nextLine(); // Consume newline character
+
+      switch (choice) {
+         case 1:
+            createOrder();
+            break;
+         case 2:
+            //viewAllOrders();
+            break;
+         case 3:
+            //searchOrder();
+            break;
+         case 4:
+            //updateOrder();
+            break;
+         case 5:
+            return; // Go back to main menu
+         default:
+            System.out.println("Invalid choice! Please try again.");
+            System.out.println();
+      }
+   }
+   
+ }
 
 
 
