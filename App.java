@@ -1,4 +1,7 @@
 import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 class App {
 
@@ -25,7 +28,7 @@ class App {
 
 // Order data --> order (orderId,date,amount,customerId)
 
-    static int[] orderId = new int[MAX_ORDERS];
+    static int[] orderIds = new int[MAX_ORDERS];
     static String[] orderDate = new String[MAX_ORDERS];
     static double[] orderAmount = new double[MAX_ORDERS];
     static int[] orderCustomerId = new int[MAX_ORDERS];
@@ -443,41 +446,198 @@ class App {
 
  static void processOrders() {
 
-   while (true) {
-      System.out.println();
-      System.out.println("===ORDER MANAGEMENT===");
-      System.out.println("1. Create Order");
-      System.out.println("2. View All Orders");
-      System.out.println("3. Search Order");
-      System.out.println("4. Update Order");
-      System.out.println("5. Back to Main Menu");
-      System.out.print("Enter your choice: ");
-      
-      int choice = scanner.nextInt();
-      scanner.nextLine(); // Consume newline character
+   if (customerCount == 0) {
+      System.out.println("There is no customer to process! please add a customer first.");
+      return;
+   }
 
-      switch (choice) {
-         case 1:
-            createOrder();
-            break;
-         case 2:
-            //viewAllOrders();
-            break;
-         case 3:
-            //searchOrder();
-            break;
-         case 4:
-            //updateOrder();
-            break;
-         case 5:
-            return; // Go back to main menu
-         default:
-            System.out.println("Invalid choice! Please try again.");
-            System.out.println();
+   if (productCount == 0) {
+      System.out.println("There are no products available for order processing! Please add products first.");
+      return;
+   }
+
+   System.out.println("Enter order Id: ");
+   int orderId = scanner.nextInt();
+   scanner.nextLine(); // Consume newline character
+
+   // Check for duplicate order ID
+   for (int i=0; i<orderCount; i++) {
+      if (orderIds[i] == orderId) {
+         System.out.println("Order ID already exists. Please enter a unique Order ID.");
+         return;
       }
    }
+
+   System.out.println("Enter customer Id: ");
+   int customerId = scanner.nextInt();
+
+   //veridfy customer exists
+   boolean customerExists = false;
+   for (int i = 0; i < customerCount; i++) {
+      if (customerIds[i] == customerId) {
+         customerExists = true;  
+         break;
+      }
+   }
+
+   if (!customerExists){
+      System.out.println("Customer with ID " + customerId + " not found.");
+      return;
+   }
+
+   String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+   double totalAmount = 0;
+
+   System.out.println("\nAdding items to order (enter 'Done' as product code to finish)");
+
+   while (true) {
+      System.out.println("Enter Product Code: ");
+      String productCode = scanner.nextLine();
+
+      if (productCode.equalsIgnoreCase("Done")) {
+         break;
+      }
+
+      int productIndex = -1;
+      for (int i=0;i< productCount;i++) {
+         if (productCodes[i].equalsIgnoreCase(productCode)) {
+            productIndex = i;
+            break;
+         }
+      }
+
+      if (productIndex == -1) {
+         System.out.println("Product with code " + productCode + " not found.");
+         continue;
+      }
+
+      System.out.println("Product: "+productDescriptions[productIndex]);
+      System.out.println("Available Stock: " + productQtyOnHand[productIndex]);
+      System.out.println("Unit Price: LKR " + productUnitPrice[productIndex]);   
+
+      System.out.println("Enter Quantity: ");
+      int quantity = scanner.nextInt();
+      scanner.nextLine(); // Consume newline character
+
+      if (quantity <= 0) {
+         System.out.println("Invalid quantity. Please enter a positive number.");
+         continue;
+      }
+
+      if (quantity > productQtyOnHand[productIndex]) {
+         System.out.println("Insufficient stock available.");
+         continue;
+      }
+
+      // ADD to the order
+      if (orderDetailCount >= MAX_ORDER_DETAILS) {
+         System.out.println("Order detail limit reached. Cannot add more items to the order.");
+         return;
+      }
+
+      detailOrderIds[orderDetailCount] = orderId;
+      detailProductCodes[orderDetailCount] = productCode;
+      detailDates[orderDetailCount] = currentDate;
+      detailQty[orderDetailCount] = quantity;
+      detailUnitPrice[orderDetailCount] = productUnitPrice[productIndex];
+
+      double itemTotal = quantity * productUnitPrice[productIndex];
+      totalAmount += itemTotal;
+      
+
+      //update stock
+      productQtyOnHand[productIndex] -= quantity;
+      orderDetailCount++;
+
+      System.out.printf("Added : %d x %s = LKR %.2f%n", quantity, productDescriptions[productIndex], itemTotal);
+      System.out.printf("Order processed successfully! Total Amount: LKR %.2f%n", totalAmount);
+
+   }
+
+   if (totalAmount > 0) {
+      orderIds[orderCount] = orderId;
+      orderDate[orderCount] = currentDate;
+      orderAmount[orderCount] = totalAmount;
+      orderCustomerId[orderCount] = customerId;
+      orderCount++;
+      System.out.printf("Order processed successfully! Total Amount: LKR %.2f%n", totalAmount);
+
+      //print receipt -->
+      printReceipt(orderId);
+   }else {
+      System.out.println("No items added to the order. Order not processed.");
+      return;
+   }
+
+  
+}
+
+// ================  Utilities ==================
+
+static void printReceipt(int orderId) {
+   System.out.println("\n"+"=".repeat(50));
+   System.out.println("               RECEIPT             ");
+   System.out.println("=".repeat(50));
+
+   // find order
+   for (int i = 0; i < orderCount; i++) {
+      if (orderIds[i] == orderId) {
+         System.out.printf("Order Id: "+ orderIds[i]);
+         System.out.println("Date: "+orderDate[i]);
+
+         //find customer
+         for (int j=0; j<customerCount;j++){
+            if (customerIds[j] == orderCustomerId[i]) {
+               System.out.println("Customer Name: "+ customerName[j]);
+               break;
+            }
+         }
+
+         System.out.println("-".repeat(50));
+         System.out.printf("%-20s %-5s %-10s %-15s%n", "Product Code", "Qty", "Price", "Total");
+         System.out.println("-".repeat(50));
+
+         double total = 0;
+         for (int k=0; k< orderDetailCount; k++) {
+            if (detailOrderIds[k] == orderId) {
+               //product description
+               String description = "";
+               for (int m=0; m<productCount; m++) {
+                  if (productCodes[m].equals(detailProductCodes[k])) {
+                     description = productDescriptions[m];
+                     break;
+                  }
+               }
+
+               double itemTotal = detailQty[k] * detailUnitPrice[k];
+               total += itemTotal;
+
+               System.out.printf("%-20s %-5d LKR %-10.2f LKR %-15.2f%n",
+                     description.length() > 20 ? description.substring(0, 20) : description,
+                     detailQty[k], detailUnitPrice[k], itemTotal);
+            }
+         }
+
+         System.out.println("-".repeat(50));
+         System.out.printf("Total: LKR %.2f%n", total);
+         System.out.println("-".repeat(50));
+         System.out.println();
+         break;
+      }
+   }
+
+}
+
+
+
+
+
+
+
+
+
    
- }
+ 
 
 
 
@@ -485,7 +645,7 @@ class App {
 
 
 
-   public static void main(String[] args) {
+public static void main(String[] args) {
 
       initializeSampleData();
 
