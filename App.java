@@ -276,7 +276,7 @@ class App {
                updateProduct();
                break;
             case 5:
-               //updateStock();
+               updateStock();
                break;
             case 6:
                return;    // Go back to main menu
@@ -363,16 +363,81 @@ class App {
 
    static void updateProduct() {
 
-      
+      System.out.println("Enter the product code to update:");
+      String updateCode = scanner.nextLine();
 
+
+      for (int i = 0;i<productCount;i++) {
+
+         if (productCodes[i].equals(updateCode)){
+            System.out.println("Current Details:");
+            System.out.printf("%-10s %-30s LKR %-10.2f %-8d%n",
+                  productCodes[i], productDescriptions[i], productUnitPrice[i], productQtyOnHand[i]);
+            System.out.println();
+
+            System.out.println("Enter new details:");
+
+            System.out.println("Enter new Product Description (or press enter to keep current description): ");
+            String newDescription = scanner.nextLine();
+
+            if (!newDescription.trim().isEmpty()) {
+               productDescriptions[i] = newDescription;
+            }
+
+            System.out.println("Enter new Product Unit Price (or press -1 to keep current price): ");
+            Double priceInput = scanner.nextDouble();
+
+            if (priceInput != -1) {
+               productUnitPrice[i] = priceInput;
+            }
+
+            System.out.println("Enter new Product Stock Quantity (or press ente-1 to keep current quantity): ");
+            int newQuantityInput = scanner.nextInt();
+
+            if (newQuantityInput != -1) {
+               productQtyOnHand[i] = newQuantityInput;
+            }
+
+            System.out.println("Product updated successfully!");
+            return;
+         }
+
+      }
+
+       System.out.println("Product with code " + updateCode + " not found.");
+
+}
+
+
+   //Method to update stock
+
+   static void updateStock() {
+      System.out.println("Enter the product code to update stock:");
+      String updateCode = scanner.nextLine();
+
+      for (int i = 0; i < productCount; i++) {
+         if (productCodes[i].equals(updateCode)) {
+            System.out.println("Current Stock Quantity: " + productQtyOnHand[i]);
+            System.out.println("Enter new Stock Quantity (or press -1 to keep current quantity): ");
+            int newQuantityInput = scanner.nextInt();
+
+            if (newQuantityInput != -1) {
+               productQtyOnHand[i] = newQuantityInput;
+            }
+
+            System.out.println("Stock updated successfully!");
+            return;
+         }
+      }
+
+      System.out.println("Product with code " + updateCode + " not found.");
    }
 
 
 
 
      
-
-
+  // =========================== PROCESS ORDERS =======================================
 
 
 
@@ -406,7 +471,7 @@ class App {
                manageProducts(); 
                break;
             case 3:
-               //processOrders();
+               processOrders();
                break;
             case 4:
                //viewOrders();
